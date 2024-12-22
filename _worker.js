@@ -17,8 +17,8 @@ export default {
             return new Response("No valid links found.\n", { status: 500 });
         }
 
-        // 按国家分组，随机取一半
-        const selectedLinks = selectRandomHalfByCountry(validLinks);
+        // 按国家分组，提取每个国家最多5个链接
+        const selectedLinks = selectTopFiveByCountry(validLinks);
 
         // 替换第一行的 #国家代码 为 #极链提供
         if (selectedLinks.length > 0) {
@@ -91,14 +91,13 @@ function extractLinks(decodedContent) {
         "罗马尼亚": "RO",
         "波兰": "PL"
     };
-  
+
     let match;
     while ((match = regex.exec(decodedContent)) !== null) {
-        console.log("Matched Data:", match); // 调试匹配内容
         const ip = match[2];
         const port = match[3];
         let countryCode = match[5];
-  
+
         // 映射国家
         for (let country in countryMapping) {
             if (countryCode.includes(country)) {
@@ -106,26 +105,25 @@ function extractLinks(decodedContent) {
                 break;
             }
         }
-  
-        console.log("Country Code After Mapping:", countryCode); // 调试国家代码
-  
+
         // 去除#后面的特殊字符和文本
         countryCode = countryCode.replace(/[^A-Za-z]/g, '');
-  
+
         // 确保 countryCode 不为空
         if (!countryCode) {
             console.warn("Country code is empty or invalid, skipping this entry.");
             continue;
         }
-  
+
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push({ link: formattedLink, countryCode });
     }
-  
+
     return links.filter(link => link.link.includes("#"));
-  }
-  // 按新的国家顺序排序链接，并随机选择一半
-  function selectRandomHalfByCountry(links) {
+}
+
+// 按国家分组并提取每个国家的前5个链接
+function selectTopFiveByCountry(links) {
     const countryOrder = [
         "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT",
         "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR",
@@ -142,27 +140,15 @@ function extractLinks(decodedContent) {
         groupedLinks[countryCode].push(link);
     });
 
-    // 按国家排序并随机选一半
+    // 提取每个国家的前5个链接
     const result = [];
     countryOrder.forEach(country => {
         if (groupedLinks[country]) {
             const linksForCountry = groupedLinks[country];
-            const halfCount = Math.ceil(linksForCountry.length / 2);
-
-            // 随机选择
-            const selectedLinks = shuffleArray(linksForCountry).slice(0, halfCount);
-            result.push(...selectedLinks);
+            // 只取前5个链接
+            result.push(...linksForCountry.slice(0, 5));
         }
     });
 
     return result;
-}
-
-// 洗牌算法随机打乱数组
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
 }
