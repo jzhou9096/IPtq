@@ -150,21 +150,4 @@ function selectRandomHalfByCountry(links) {
         if (groupedLinks[country]) {
             const linksForCountry = groupedLinks[country];
             const halfCount = Math.ceil(linksForCountry.length / 2);
-
-            // 随机选择
-            const selectedLinks = shuffleArray(linksForCountry).slice(0, halfCount);
-            result.push(...selectedLinks);
-        }
-    });
-
-    return result;
-}
-
-// 洗牌算法随机打乱数组
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
 }
