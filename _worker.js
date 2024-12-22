@@ -88,8 +88,8 @@ function extractLinks(decodedContent) {
       "爱沙尼亚": "EE",
       "拉脱维亚": "LV",
       "都柏林": "IE",
-      "西班牙": "ES"
-      "奥地利": "TA",
+      "西班牙": "ES",
+      "奥地利": "AT",  // 更正为 AT
       "罗马尼亚": "RO",
       "波兰": "PL"
   };
@@ -114,10 +114,14 @@ function extractLinks(decodedContent) {
       // 去除#后面的特殊字符和文本
       countryCode = countryCode.replace(/[^A-Za-z]/g, '');
 
-      const formattedLink = `${ip}:${port}#${countryCode}`;
-      if (countryCode) {
-          links.push({ link: formattedLink, countryCode });
+      // 确保 countryCode 不为空
+      if (!countryCode) {
+          console.warn("Country code is empty or invalid, skipping this entry.");
+          continue;
       }
+
+      const formattedLink = `${ip}:${port}#${countryCode}`;
+      links.push({ link: formattedLink, countryCode });
   }
 
   return links.filter(link => link.link.includes("#"));
@@ -127,9 +131,8 @@ function selectRandomHalfByCountry(links) {
   const countryOrder = [
       "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT",
       "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR",
-      "CZ", "EE", "LV", "IE", "ES", "TA", "RO", "PL"
+      "CZ", "EE", "LV", "IE", "ES", "AT", "RO", "PL"
   ];
-
 
     const groupedLinks = {};
 
