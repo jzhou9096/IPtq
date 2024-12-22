@@ -18,7 +18,9 @@ export default {
         }
 
         // 按国家分组，随机取一半
-        const selectedLinks = selectRandomHalfByCountry(validLinks);
+        const selectedLinks = validLinks.filter(link => countriesToInclude.includes(link.country));
+
+console.log(selectedLinks);
 
         // 替换第一行的 #国家代码 为 #极链提供
         if (selectedLinks.length > 0) {
@@ -58,68 +60,76 @@ async function fetchLinks(url) {
 }
 
 function extractLinks(decodedContent) {
-    const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^\n]+)/g;
-    const links = [];
-    const countryMapping = {
-        "香港": "HK",
-        "韩国": "KR",
-        "台湾": "TW",
-        "日本": "JP",
-        "新加坡": "SG",
-        "美国": "US",
-        "加拿大": "CA",
-        "澳大利亚": "AU",
-        "英国": "GB",
-        "法国": "FR",
-        "意大利": "IT",
-        "荷兰": "NL",
-        "德国": "DE",
-        "挪威": "NO",
-        "芬兰": "FI",
-        "瑞典": "SE",
-        "丹麦": "DK",
-        "立陶宛": "LT",
-        "俄罗斯": "RU",
-        "印度": "IN",
-        "土耳其": "TR"
-    };
+  const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^\n]+)/g;
+  const links = [];
+  const countryMapping = {
+      "香港": "HK",
+      "韩国": "KR",
+      "台湾": "TW",
+      "日本": "JP",
+      "新加坡": "SG",
+      "美国": "US",
+      "加拿大": "CA",
+      "澳大利亚": "AU",
+      "英国": "GB",
+      "法国": "FR",
+      "意大利": "IT",
+      "荷兰": "NL",
+      "德国": "DE",
+      "挪威": "NO",
+      "芬兰": "FI",
+      "瑞典": "SE",
+      "丹麦": "DK",
+      "立陶宛": "LT",
+      "俄罗斯": "RU",
+      "印度": "IN",
+      "土耳其": "TR",
+      "捷克": "CZ",
+      "爱沙尼亚": "EE",
+      "拉脱维亚": "LV",
+      "都柏林": "IE",
+      "西班牙": "ES"
+      "奥地利": "TA",
+      "罗马尼亚": "RO",
+      "波兰": "PL"
+  };
 
-    let match;
-    while ((match = regex.exec(decodedContent)) !== null) {
-        const ip = match[2];
-        const port = match[3];
-        let countryCode = match[5];
+  let match;
+  while ((match = regex.exec(decodedContent)) !== null) {
+      console.log("Matched Data:", match); // 调试匹配内容
+      const ip = match[2];
+      const port = match[3];
+      let countryCode = match[5];
 
-        // 映射国家
-        for (let country in countryMapping) {
-            if (countryCode.includes(country)) {
-                countryCode = countryMapping[country];
-                break;
-            }
-        }
+      // 映射国家
+      for (let country in countryMapping) {
+          if (countryCode.includes(country)) {
+              countryCode = countryMapping[country];
+              break;
+          }
+      }
 
-        // 去除#后面的特殊字符和文本
-        countryCode = countryCode.replace(/[^A-Za-z]/g, ''); // 只保留字母字符
+      console.log("Country Code After Mapping:", countryCode); // 调试国家代码
 
-        // 形成格式化的链接
-        const formattedLink = `${ip}:${port}#${countryCode}`;
+      // 去除#后面的特殊字符和文本
+      countryCode = countryCode.replace(/[^A-Za-z]/g, '');
 
-        // 只保留包含有效国家代码的链接
-        if (countryCode && countryCode !== 'PL') {
-            links.push({ link: formattedLink, countryCode: countryCode });
-        }
-    }
+      const formattedLink = `${ip}:${port}#${countryCode}`;
+      if (countryCode) {
+          links.push({ link: formattedLink, countryCode });
+      }
+  }
 
-    // 过滤无效的链接，确保是有效的 IP 地址格式
-    return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.link.split('#')[0]));
+  return links.filter(link => link.link.includes("#"));
 }
 
-// 按新的国家顺序排序链接，并随机选择一半
 function selectRandomHalfByCountry(links) {
-    const countryOrder = [
-        "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
-        "FI", "SE", "DK", "LT", "RU", "IN", "TR"
-    ];
+  const countryOrder = [
+      "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT",
+      "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR",
+      "CZ", "EE", "LV", "IE", "ES", "TA", "RO", "PL"
+  ];
+
 
     const groupedLinks = {};
 
