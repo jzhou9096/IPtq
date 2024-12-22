@@ -81,15 +81,24 @@ function extractLinks(decodedContent) {
         "立陶宛": "LT",
         "俄罗斯": "RU",
         "印度": "IN",
-        "土耳其": "TR"
+        "土耳其": "TR",
+        "捷克": "CZ",
+        "爱沙尼亚": "EE",
+        "拉脱维亚": "LV",
+        "都柏林": "IE",
+        "西班牙": "ES",
+        "奥地利": "AT", 
+        "罗马尼亚": "RO",
+        "波兰": "PL"
     };
-
+  
     let match;
     while ((match = regex.exec(decodedContent)) !== null) {
+        console.log("Matched Data:", match); // 调试匹配内容
         const ip = match[2];
         const port = match[3];
         let countryCode = match[5];
-
+  
         // 映射国家
         for (let country in countryMapping) {
             if (countryCode.includes(country)) {
@@ -97,28 +106,30 @@ function extractLinks(decodedContent) {
                 break;
             }
         }
-
+  
+        console.log("Country Code After Mapping:", countryCode); // 调试国家代码
+  
         // 去除#后面的特殊字符和文本
-        countryCode = countryCode.replace(/[^A-Za-z]/g, ''); // 只保留字母字符
-
-        // 形成格式化的链接
-        const formattedLink = `${ip}:${port}#${countryCode}`;
-
-        // 只保留包含有效国家代码的链接
-        if (countryCode && countryCode !== 'PL') {
-            links.push({ link: formattedLink, countryCode: countryCode });
+        countryCode = countryCode.replace(/[^A-Za-z]/g, '');
+  
+        // 确保 countryCode 不为空
+        if (!countryCode) {
+            console.warn("Country code is empty or invalid, skipping this entry.");
+            continue;
         }
+  
+        const formattedLink = `${ip}:${port}#${countryCode}`;
+        links.push({ link: formattedLink, countryCode });
     }
-
-    // 过滤无效的链接，确保是有效的 IP 地址格式
-    return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.link.split('#')[0]));
-}
-
-// 按新的国家顺序排序链接，并随机选择一半
-function selectRandomHalfByCountry(links) {
+  
+    return links.filter(link => link.link.includes("#"));
+  }
+  // 按新的国家顺序排序链接，并随机选择一半
+  function selectRandomHalfByCountry(links) {
     const countryOrder = [
-        "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
-        "FI", "SE", "DK", "LT", "RU", "IN", "TR"
+        "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT",
+        "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR",
+        "CZ", "EE", "LV", "IE", "ES", "AT", "RO", "PL"
     ];
 
     const groupedLinks = {};
