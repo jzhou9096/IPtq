@@ -124,7 +124,7 @@ function extractLinks(decodedContent) {
   
     return links.filter(link => link.link.includes("#"));
   }
-  
+  // 按新的国家顺序排序链接，并随机选择一半
   function selectRandomHalfByCountry(links) {
     const countryOrder = [
         "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT",
