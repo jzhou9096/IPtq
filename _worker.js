@@ -133,21 +133,11 @@ function selectRandomHalfByCountry(links) {
       "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR",
       "CZ", "EE", "LV", "IE", "ES", "AT", "RO", "PL"
   ];
+// 这里可以按需要进行链接筛选、随机选择等操作
+  const selectedLinks = links.filter(link => countryOrder.includes(link.countryCode));
 
-    const groupedLinks = {};
-
-    // 分组链接
-    links.forEach(({ link, countryCode }) => {
-        if (!groupedLinks[countryCode]) {
-            groupedLinks[countryCode] = [];
-        }
-        groupedLinks[countryCode].push(link);
-    });
-
-    // 按国家排序并随机选一半
-    const result = [];
-    countryOrder.forEach(country => {
-        if (groupedLinks[country]) {
-            const linksForCountry = groupedLinks[country];
-            const halfCount = Math.ceil(linksForCountry.length / 2);
+  // 如果需要进行随机选择，可以使用如下代码：
+  // return selectedLinks.sort(() => Math.random() - 0.5);
+  
+  return selectedLinks;
 }
